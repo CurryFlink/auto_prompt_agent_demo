@@ -1,6 +1,1 @@
-.env
-.env.template
-__pycache__/
-outputs/
-test.jpg
-test.png
+.env*
