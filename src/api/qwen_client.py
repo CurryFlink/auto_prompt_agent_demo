@@ -35,6 +35,7 @@ class QwenClient:
     def evaluate_image(self, image_path, prompt):
         """使用 OpenAI 兼容模式调用 qwen3.6-plus 进行图像理解"""
         try:
+            print(f"DEBUG: Calling evaluate_image for {image_path}...")
             # 将图片转换为 base64
             with open(image_path, "rb") as image_file:
                 base64_image = base64.b64encode(image_file.read()).decode('utf-8')
@@ -56,6 +57,7 @@ class QwenClient:
                     }
                 ],
             )
+            print(f"DEBUG: Received response from evaluate_image.")
             return response.choices[0].message.content
         except Exception as e:
             print(f"Error in evaluate_image: {e}")
