@@ -35,6 +35,7 @@ class QwenClient:
     def evaluate_image(self, image_path, prompt):
         """使用 OpenAI 兼容模式调用 qwen3.6-plus 进行图像理解"""
         try:
+            print(f"DEBUG: Calling evaluate_image for {image_path}...")
             # 将图片转换为 base64
             with open(image_path, "rb") as image_file:
                 base64_image = base64.b64encode(image_file.read()).decode('utf-8')
@@ -56,6 +57,7 @@ class QwenClient:
                     }
                 ],
             )
+            print(f"DEBUG: Received response from evaluate_image.")
             return response.choices[0].message.content
         except Exception as e:
             print(f"Error in evaluate_image: {e}")
@@ -67,7 +69,7 @@ class ImageGenClient:
         self.api_key = api_key
         self.url = "https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation"
 
-    def generate_image(self, prompt, output_dir="outputs", iteration=None):
+    def generate_image(self, prompt, output_dir="outputs", iteration=None, seed=None, prompt_extend=True):
         """使用标准 API 格式调用 qwen-image-2.0-pro 生成图像"""
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
@@ -88,9 +90,12 @@ class ImageGenClient:
             },
             "parameters": {
                 "n": 1,
-                "size": "1024*1024"
+                "size": "1024*1024",
+                "prompt_extend": prompt_extend
             }
         }
+        if seed is not None:
+            data["parameters"]["seed"] = seed
 
         response = requests.post(self.url, headers=headers, json=data)
         if response.status_code == 200:
@@ -122,7 +127,7 @@ class ImageGenClient:
         else:
             raise Exception(f"Error in generate_image: {response.text}")
 
-    def edit_image(self, image_path, prompt, output_dir="outputs", iteration=None):
+    def edit_image(self, image_path, prompt, output_dir="outputs", iteration=None, seed=None, prompt_extend=True):
         """使用标准 API 格式调用 qwen-image-2.0-pro 编辑图像"""
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
@@ -149,9 +154,12 @@ class ImageGenClient:
             },
             "parameters": {
                 "n": 1,
-                "size": "1024*1024"
+                "size": "1024*1024",
+                "prompt_extend": prompt_extend
             }
         }
+        if seed is not None:
+            data["parameters"]["seed"] = seed
 
         response = requests.post(self.url, headers=headers, json=data)
         if response.status_code == 200:
